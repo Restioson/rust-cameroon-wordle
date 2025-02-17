@@ -1,0 +1,43 @@
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="wordle.css"/>
+        <title>Rust Cameroon Wasm</title>
+    </head>
+
+    <body>
+        <div id="main_wrap">
+            <div id="loading_spinner_container">
+                <div id="loading_spinner"></div>
+            </div>
+
+            <script type="module">
+                import init, { start_wordle } from '/target/wasm32-unknown-unknown/debug/rust_cameroon_wordle.js';
+
+                // Check if the browser supports WebAssembly
+                const supported = (() => {
+                    try {
+                        if (typeof WebAssembly === "object" && typeof WebAssembly.instantiate === "function") {
+                            const module = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+                            if (module instanceof WebAssembly.Module) {
+                                return new WebAssembly.Instance(module) instanceof WebAssembly.Instance;
+                            }
+                        }
+                    } catch (e) {}
+                    return false;
+                })();
+
+                if (supported) {
+                    await (await init());
+                    start_wordle();
+                } else {
+                    let msg = document.createElement("p");
+                    msg.innerText = 'WebAssembly is required to play Wordle';
+                    document.getElementById("main_wrap").appendChild(msg);
+                }
+            </script>
+
+            <noscript>Javascript is required to play Wordle</noscript>
+        </div>
+    </body>
+</html>
